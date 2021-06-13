@@ -6,6 +6,7 @@ services:
     restart: unless-stopped
     networks:
       net:
+        ipv4_address: 10.69.0.2
     environment:
       - DOMAIN=https://bw.${DOMAIN_NAME}
     env_file: 
@@ -17,6 +18,7 @@ services:
     restart: unless-stopped
     networks:
       net:
+        ipv4_address: 10.69.0.5
     ports:
       - 80:80
       - 443:443
@@ -50,6 +52,7 @@ services:
     build: ./openvpn
     networks:
       net:
+        ipv4_address: 10.69.0.6
     ports:
       - "1194:1194/udp"
     volumes:
@@ -62,6 +65,7 @@ services:
     image: satishweb/doh-server
     networks:
       net:
+        ipv4_address: 10.69.0.7
     environment:
       - UPSTREAM_DNS_SERVER=udp:bind:53
 
