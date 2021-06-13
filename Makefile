@@ -11,6 +11,7 @@ Commands:
 	setup		- Initial setup.
 	start		- Start the containers.
 	stop		- Stop the containers.
+endef
 
 build:
 	@$(DC) build

@@ -39,13 +39,10 @@ services:
       - "./dnscrypt-proxy/blocked-names.txt:/etc/dnscrypt-proxy/blocked-names.txt:ro"
     restart: unless-stopped    
   bind:
-    image: resystit/bind9
+    build: ./bind9
     networks:
       net:
         ipv4_address: 10.69.0.4
-    volumes:
-      - "./bind9/named.conf:/etc/bind/named.conf"
-      - "./bind9/db.local:/etc/bind/db.local"
     ports:
       - 53:53
   openvpn:
