@@ -20,6 +20,12 @@ services:
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
       - EMAIL=${EMAIL}
+  dnscryptProxy:
+    image: gists/dnscrypt-proxy
+    volumes:
+      - "./dnscrypt-proxy/dnscrypt-proxy.toml:/etc/dnscrypt-proxy/dnscrypt-proxy.toml:ro"
+      - "./dnscrypt-proxy/blocked-names.txt:/etc/dnscrypt-proxy/blocked-names.txt:ro"
+    restart: unless-stopped    
 
 volumes:
   bw_data:
