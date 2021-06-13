@@ -1,6 +1,13 @@
 version: "3.6"
 
 services:
+  vaultwarden:
+    image: vaultwarden/server:alpine
+    restart: unless-stopped
+    environment:
+      - WEBSOCKET_ENABLED=true
+    volumes:
+      - "./data/bw:/data"
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
@@ -15,4 +22,5 @@ services:
       - EMAIL=${EMAIL}
 
 volumes:
+  bw_data:
   caddy_data:
