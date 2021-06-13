@@ -67,6 +67,20 @@ services:
     environment:
       - UPSTREAM_DNS_SERVER=udp:bind:53
       - DOH_HTTP_PREFIX=/dns-query
+  dot:
+    image: dweomer/stunnel
+    volumes:
+      - "$(CERTS_PATH).key:/etc/stunnel/stunnel.key:ro"
+      - "$(CERTS_PATH).crt:/etc/stunnel/stunnel.crt:ro"
+    networks:
+      net:
+        ipv4_address:10.69.0.8
+    ports:
+      - "853:853"
+    environment:
+      - STUNNEL_SERVICE=dot
+      - STUNNEL_ACCEPT=853
+      - STUNNEL_CONNECT=dns:53
 
 networks:
   net:
