@@ -8,6 +8,8 @@ services:
       net:
     environment:
       - DOMAIN=https://bw.${DOMAIN_NAME}
+    env_file: 
+      - .env
     volumes:
       - "./data/bw:/data"
   caddy:
@@ -44,7 +46,22 @@ services:
       - "./bind9/db.local:/etc/bind/db.local"
     ports:
       - 53:53
+  openvpn:
+    build: ./openvpn
+    networks:
+      net:
+    ports:
+      - "1194:11194/udp"
+    volumes:
+      - "./data/openvpn:/data"
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+    cap_add:
+      - NET_ADMIN
 
-volumes:
-  bw_data:
-  caddy_data:
+networks:
+  net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.69.0.0/24
