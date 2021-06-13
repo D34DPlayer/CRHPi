@@ -23,6 +23,9 @@ VPN:
 
 endef
 
+help:
+	@echo "$$HELP"
+
 build:
 	@$(DC) build
 
