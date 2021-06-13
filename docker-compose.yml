@@ -74,7 +74,7 @@ services:
       - "${CERTS_PATH}.crt:/etc/stunnel/stunnel.crt:ro"
     networks:
       net:
-        ipv4_address:10.69.0.8
+        ipv4_address: 10.69.0.8
     ports:
       - "853:853"
     environment:
