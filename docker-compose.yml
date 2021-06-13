@@ -58,6 +58,12 @@ services:
       - DOMAIN_NAME=${DOMAIN_NAME}
     cap_add:
       - NET_ADMIN
+  doh:
+    image: satishweb/doh-server
+    networks:
+      net:
+    environment:
+      - UPSTREAM_DNS_SERVER=udp:bind:53
 
 networks:
   net:

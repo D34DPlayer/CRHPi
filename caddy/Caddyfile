@@ -21,6 +21,7 @@ bw.{$DOMAIN_NAME} {
 }
 
 {$DOMAIN_NAME}, www.{$DOMAIN_NAME} {
+  reverse_proxy /dns-query doh:8053
   root * /usr/share/caddy
   file_server
 }
