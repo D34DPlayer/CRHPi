@@ -19,3 +19,8 @@ bw.{$DOMAIN_NAME} {
        header_up X-Real-IP {remote_host}
   }
 }
+
+{$DOMAIN_NAME}, www.{$DOMAIN_NAME} {
+  root * /usr/share/caddy
+  file_server
+}
