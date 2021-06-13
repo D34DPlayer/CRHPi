@@ -80,7 +80,7 @@ services:
     environment:
       - STUNNEL_SERVICE=dot
       - STUNNEL_ACCEPT=853
-      - STUNNEL_CONNECT=dns:53
+      - STUNNEL_CONNECT=bind:53
 
 networks:
   net:
