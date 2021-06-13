@@ -1,0 +1,18 @@
+version: "3.6"
+
+services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "./caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
+      - "./data/caddy:/data"
+    environment:
+      - DOMAIN_NAME=${DOMAIN_NAME}
+      - EMAIL=${EMAIL}
+
+volumes:
+  caddy_data:
