@@ -20,8 +20,8 @@ VPN:
 	vpn-users			- List the VPN users.
 	vpn-get USER=XXX	- Creates a file to connect as a VPN user.
 	vpn-remove USER=XXX	- Remove VPN user.
-
 endef
+export HELP
 
 help:
 	@echo "$$HELP"
