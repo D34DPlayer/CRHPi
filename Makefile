@@ -11,6 +11,7 @@ Commands:
 	setup		- Initial setup.
 	start		- Start the containers.
 	stop		- Stop the containers.
+	logs		- Show the containers' logs.
 endef
 
 build:
@@ -25,3 +26,5 @@ stop down:
 setup:
 	$(DC) run openvpn ovpn_initpki
 
+logs:
+	$(DC) logs -f
