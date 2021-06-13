@@ -71,7 +71,7 @@ services:
     build: ./stunnel
     volumes:
       - "${CERTS_PATH}.key:/etc/stunnel/stunnel.key:ro"
-      - "${CERTS_PATH}.crt:/etc/stunnel/stunnel.crt:ro"
+      - "${CERTS_PATH}.crt:/etc/stunnel/stunnel.pem:ro"
     networks:
       net:
         ipv4_address: 10.69.0.8
