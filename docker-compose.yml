@@ -45,6 +45,7 @@ services:
         ipv4_address: 10.69.0.4
     ports:
       - 53:53
+      - 53:53/udp
   openvpn:
     build: ./openvpn
     networks:
@@ -65,6 +66,7 @@ services:
         ipv4_address: 10.69.0.7
     environment:
       - UPSTREAM_DNS_SERVER=udp:bind:53
+      - DOH_HTTP_PREFIX=/dns-query
 
 networks:
   net:

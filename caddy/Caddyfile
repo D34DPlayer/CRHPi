@@ -10,7 +10,6 @@
 
 bw.{$DOMAIN_NAME} {
   tls {$EMAIL}
-
   encode gzip
 
   reverse_proxy /notifications/hub vaultwarden:3012
@@ -21,7 +20,15 @@ bw.{$DOMAIN_NAME} {
 }
 
 {$DOMAIN_NAME}, www.{$DOMAIN_NAME} {
-  reverse_proxy /dns-query doh:8053
-  root * /usr/share/caddy
-  file_server
+  tls {$EMAIL}
+  encode gzip
+
+  handle /dns-query {
+    reverse_proxy /dns-query doh:8053
+  }
+
+  handle {
+    root * /usr/share/caddy
+    file_server
+  }
 }

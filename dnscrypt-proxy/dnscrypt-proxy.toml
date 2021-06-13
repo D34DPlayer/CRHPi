@@ -31,7 +31,7 @@
 ## Example with both IPv4 and IPv6:
 ## listen_addresses = ['127.0.0.1:53', '[::1]:53']
 
-listen_addresses = ['127.0.0.1:5353']
+listen_addresses = ['127.0.0.1:5353', '10.69.0.3:5353']
 
 
 ## Maximum number of simultaneous client connections to accept
@@ -152,7 +152,7 @@ log_level = 3
 ## This file is different from other log files, and will not be
 ## automatically rotated by the application.
 
-# log_file = '/var/log/dnscrypt-proxy/dnscrypt-proxy.log'
+log_file = '/var/log/dnscrypt-proxy/dnscrypt-proxy.log'
 
 
 ## When using a log file, only keep logs from the most recent launch.
