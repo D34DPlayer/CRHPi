@@ -2,7 +2,7 @@ version: "3.6"
 
 services:
   vaultwarden:
-    image: vaultwarden/server:alpine
+    image: vaultwarden/server:latest # with amd64 and armv7 you can use alpine
     restart: unless-stopped
     networks:
       net:
@@ -51,7 +51,7 @@ services:
     networks:
       net:
     ports:
-      - "1194:11194/udp"
+      - "1194:1194/udp"
     volumes:
       - "./data/openvpn:/data"
     environment:
