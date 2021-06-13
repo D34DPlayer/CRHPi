@@ -4,6 +4,8 @@ services:
   vaultwarden:
     image: vaultwarden/server:alpine
     restart: unless-stopped
+    networks:
+      net:
     environment:
       - DOMAIN=https://bw.${DOMAIN_NAME}
     volumes:
@@ -11,10 +13,13 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: unless-stopped
+    networks:
+      net:
     ports:
       - 80:80
       - 443:443
     volumes:
+      - "./caddy/dist:/usr/share/caddy"
       - "./caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
       - "./data/caddy:/data"
     environment:
@@ -22,10 +27,23 @@ services:
       - EMAIL=${EMAIL}
   dnscryptProxy:
     image: gists/dnscrypt-proxy
+    networks:
+      net:
+        ipv4_address: 10.69.0.3
     volumes:
       - "./dnscrypt-proxy/dnscrypt-proxy.toml:/etc/dnscrypt-proxy/dnscrypt-proxy.toml:ro"
       - "./dnscrypt-proxy/blocked-names.txt:/etc/dnscrypt-proxy/blocked-names.txt:ro"
     restart: unless-stopped    
+  bind:
+    image: resystit/bind9
+    networks:
+      net:
+        ipv4_address: 10.69.0.4
+    volumes:
+      - "./bind9/named.conf:/etc/bind/named.conf"
+      - "./bind9/db.local:/etc/bind/db.local"
+    ports:
+      - 53:53
 
 volumes:
   bw_data:
