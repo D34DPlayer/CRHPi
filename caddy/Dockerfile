@@ -17,5 +17,5 @@ RUN npm run build
 
 # production stage
 FROM caddy:2-alpine
-COPY ./caddy/Caddyfile /etc/caddy/Caddyfile
+COPY ./Caddyfile /etc/caddy/Caddyfile
 COPY --from=build-stage /app/dist /usr/share/portfolio
