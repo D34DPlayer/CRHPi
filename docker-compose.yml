@@ -4,11 +4,8 @@ services:
   vaultwarden:
     image: vaultwarden/server:latest # with amd64 and armv7 you can use alpine
     restart: unless-stopped
-    networks:
-      net:
-        ipv4_address: 10.69.0.2
     environment:
-      - DOMAIN=https://bw.${DOMAIN_NAME}
+      DOMAIN: https://bw.${DOMAIN_NAME}
     env_file: 
       - .env
     volumes:
@@ -19,22 +16,19 @@ services:
       args:
         - VUE_APP_DOMAIN_NAME=www.d34d.fun
     restart: unless-stopped
-    networks:
-      net:
-        ipv4_address: 10.69.0.5
     ports:
       - 80:80
       - 443:443
     volumes:
       - "./data/caddy:/data"
     environment:
-      - DOMAIN_NAME=${DOMAIN_NAME}
-      - EMAIL=${EMAIL}
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      EMAIL: ${EMAIL}
   dnscryptProxy:
     image: gists/dnscrypt-proxy
     networks:
-      net:
-        ipv4_address: 10.69.0.3
+      default:
+        ipv4_address: 10.69.0.101
     volumes:
       - "./dnscrypt-proxy/dnscrypt-proxy.toml:/etc/dnscrypt-proxy/dnscrypt-proxy.toml:ro"
       - "./dnscrypt-proxy/blocked-names.txt:/etc/dnscrypt-proxy/blocked-names.txt:ro"
@@ -42,46 +36,37 @@ services:
   bind:
     build: ./bind9
     networks:
-      net:
-        ipv4_address: 10.69.0.4
+      default:
+        ipv4_address: 10.69.0.102
     ports:
       - 53:53
       - 53:53/udp
   openvpn:
     build: ./openvpn
-    networks:
-      net:
-        ipv4_address: 10.69.0.6
     ports:
       - "1194:1194/udp"
     volumes:
       - "./data/openvpn:/data"
     environment:
-      - DOMAIN_NAME=${DOMAIN_NAME}
+      DOMAIN_NAME: ${DOMAIN_NAME}
     cap_add:
       - NET_ADMIN
   doh:
     image: satishweb/doh-server
-    networks:
-      net:
-        ipv4_address: 10.69.0.7
     environment:
-      - UPSTREAM_DNS_SERVER=udp:bind:53
-      - DOH_HTTP_PREFIX=/dns-query
+      UPSTREAM_DNS_SERVER: udp:bind:53
+      DOH_HTTP_PREFIX: /dns-query
   dot:
     build: ./stunnel
     volumes:
       - "${CERTS_PATH}.key:/etc/stunnel/stunnel.key:ro"
       - "${CERTS_PATH}.crt:/etc/stunnel/stunnel.pem:ro"
-    networks:
-      net:
-        ipv4_address: 10.69.0.8
     ports:
       - "853:853"
     environment:
-      - STUNNEL_SERVICE=dot
-      - STUNNEL_ACCEPT=853
-      - STUNNEL_CONNECT=bind:53
+      STUNNEL_SERVICE: dot
+      STUNNEL_ACCEPT: 853
+      STUNNEL_CONNECT: bind:53
 
 networks:
   net:

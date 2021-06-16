@@ -8,7 +8,7 @@ declare -x OVPN_DEVICE=tun
 declare -x OVPN_DEVICEN=0
 declare -x OVPN_DISABLE_PUSH_BLOCK_DNS=1
 declare -x OVPN_DNS=1
-declare -x OVPN_DNS_SERVERS=([0]="10.69.0.4")
+declare -x OVPN_DNS_SERVERS=([0]="10.69.0.102")
 declare -x OVPN_ENV=/etc/openvpn/ovpn_env.sh
 declare -x OVPN_EXTRA_CLIENT_CONFIG=()
 declare -x OVPN_EXTRA_SERVER_CONFIG=()
