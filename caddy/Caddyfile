@@ -28,7 +28,7 @@ bw.{$DOMAIN_NAME} {
   }
 
   handle {
-    root * /usr/share/caddy
+    root * /usr/share/portfolio
     file_server
   }
 }

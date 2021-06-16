@@ -14,7 +14,7 @@ services:
     volumes:
       - "./data/bw:/data"
   caddy:
-    image: caddy:2-alpine
+    build: ./caddy
     restart: unless-stopped
     networks:
       net:
@@ -23,8 +23,6 @@ services:
       - 80:80
       - 443:443
     volumes:
-      - "./caddy/dist:/usr/share/caddy"
-      - "./caddy/Caddyfile:/etc/caddy/Caddyfile:ro"
       - "./data/caddy:/data"
     environment:
       - DOMAIN_NAME=${DOMAIN_NAME}
