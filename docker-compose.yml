@@ -14,7 +14,10 @@ services:
     volumes:
       - "./data/bw:/data"
   caddy:
-    build: ./caddy
+    build:
+      context: ./caddy
+      args:
+        - VUE_APP_DOMAIN_NAME=www.d34d.fun
     restart: unless-stopped
     networks:
       net:
