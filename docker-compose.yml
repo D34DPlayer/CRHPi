@@ -83,6 +83,25 @@ services:
       DOMAIN_NAME: ${DOMAIN_NAME}
       PUBLIC_IP: ${PUBLIC_IP}
     restart: unless-stopped    
+  db:
+    image: postgres:13-alpine
+    volumes:
+      - "./data/db:/var/lib/postgresql/data"
+      - "./db/init-mail-db.sh:/docker-entrypoint-initdb.d/00-mail.sh:ro"
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
+    restart: unless-stopped    
+  postfixadmin:
+    image: postfixadmin:apache
+    environment:
+      POSTFIXADMIN_DB_TYPE: pgsql
+      POSTFIXADMIN_DB_HOST: db
+      POSTFIXADMIN_DB_USER: mail
+      POSTFIXADMIN_DB_NAME: mail
+      POSTFIXADMIN_DB_PASSWORD: ${EMAIL_PASSWORD}
+    restart: unless-stopped    
 
 networks:
   default:

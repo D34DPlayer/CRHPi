@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+
+psql -v ON_ERROR_STOP=1 -- username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    CREATE USER mail WITH PASSWORD '$EMAIL_PASSWORD';
+    CREATE DATABASE mail;
+    GRANT ALL PRIVILEGES ON DATABASE mail TO mail;
+EOSQL
