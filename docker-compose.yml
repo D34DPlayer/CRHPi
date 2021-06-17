@@ -41,6 +41,7 @@ services:
     ports:
       - 53:53
       - 53:53/udp
+    restart: unless-stopped    
   openvpn:
     build: ./openvpn
     ports:
@@ -51,11 +52,13 @@ services:
       DOMAIN_NAME: ${DOMAIN_NAME}
     cap_add:
       - NET_ADMIN
+    restart: unless-stopped    
   doh:
     image: satishweb/doh-server
     environment:
       UPSTREAM_DNS_SERVER: udp:bind:53
       DOH_HTTP_PREFIX: /dns-query
+    restart: unless-stopped    
   dot:
     build: ./stunnel
     volumes:
@@ -67,9 +70,22 @@ services:
       STUNNEL_SERVICE: dot
       STUNNEL_ACCEPT: 853
       STUNNEL_CONNECT: bind:53
+    restart: unless-stopped    
+  postfix:
+    build: ./mail/postfix
+    volumes:
+      - "${CERTS_PATH}.key:/certs/server.key:ro"
+      - "${CERTS_PATH}.crt:/certs/server.crt:ro"
+    ports:
+      - "25:25"
+      - "587:587"
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      PUBLIC_IP: ${PUBLIC_IP}
+    restart: unless-stopped    
 
 networks:
-  net:
+  default:
     ipam:
       driver: default
       config:
