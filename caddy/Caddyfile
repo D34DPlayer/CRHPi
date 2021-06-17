@@ -19,6 +19,10 @@ bw.{$DOMAIN_NAME} {
   }
 }
 
+admin.{$DOMAIN_NAME} {
+  reverse_proxy postfixadmin:80
+}
+
 {$DOMAIN_NAME}, www.{$DOMAIN_NAME} {
   tls {$EMAIL}
   encode gzip
