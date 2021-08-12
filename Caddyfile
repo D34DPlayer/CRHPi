@@ -1,0 +1,36 @@
+manga.{$MANGA_DOMAIN_NAME} {
+    encode zstd gzip
+
+    handle_path /api/* {
+        reverse_proxy api:3000 {
+            header_up X-Real-IP {remote_host}
+        }
+    }
+    handle_path /* {
+        root * /srv
+        file_server
+        try_files {path} /
+    }
+}
+
+bw.{$DOMAIN_NAME} {
+    encode zstd gzip
+
+    reverse_proxy /notifications/hub vaultwarden:3012
+
+    reverse_proxy vaultwarden:80 {
+        header_up X-Real-IP {remote_host}
+    }
+}
+
+{$DOMAIN_NAME}, www.{$DOMAIN_NAME} {
+    encode zstd gzip
+    
+    handle /dns-query {
+        reverse_proxy /dns-query doh:8053
+    }
+
+    handle {
+        reverse_proxy portfolio:8080
+    }
+}

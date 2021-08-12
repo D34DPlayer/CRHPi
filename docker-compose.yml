@@ -10,20 +10,12 @@ services:
       - .env
     volumes:
       - "./data/bw:/data"
-  caddy:
+  portfolio:
     build:
-      context: ./caddy
+      context: ./portfolio
       args:
         - VUE_APP_DOMAIN_NAME=www.d34d.fun
     restart: unless-stopped
-    ports:
-      - 80:80
-      - 443:443
-    volumes:
-      - "./data/caddy:/data"
-    environment:
-      DOMAIN_NAME: ${DOMAIN_NAME}
-      EMAIL: ${EMAIL}
   dnscryptProxy:
     image: gists/dnscrypt-proxy
     networks:
@@ -39,7 +31,7 @@ services:
       default:
         ipv4_address: 10.69.0.102
     ports:
-      - 53:53
+      - 53:53/tcp
       - 53:53/udp
     restart: unless-stopped    
   openvpn:
@@ -71,37 +63,39 @@ services:
       STUNNEL_ACCEPT: 853
       STUNNEL_CONNECT: bind:53
     restart: unless-stopped    
-  postfix:
-    build: ./mail/postfix
-    volumes:
-      - "${CERTS_PATH}.key:/certs/server.key:ro"
-      - "${CERTS_PATH}.crt:/certs/server.crt:ro"
-    ports:
-      - "25:25"
-      - "587:587"
-    environment:
-      DOMAIN_NAME: ${DOMAIN_NAME}
-      PUBLIC_IP: ${PUBLIC_IP}
-    restart: unless-stopped    
+
   db:
     image: postgres:13-alpine
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
     volumes:
-      - "./data/db:/var/lib/postgresql/data"
-      - "./db/init-mail-db.sh:/docker-entrypoint-initdb.d/00-mail.sh:ro"
+      - postgres_data:/var/lib/postgresql/data
+  api:
+    build: ./Monochrome/api
+    command: hypercorn api.main:app -b 0.0.0.0:3000 --root-path /api
+    volumes:
+      - ./media:/media
     environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      EMAIL_PASSWORD: ${EMAIL_PASSWORD}
-    restart: unless-stopped    
-  postfixadmin:
-    image: postfixadmin:apache
+      DB_URL: postgresql+asyncpg://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
+      SECRET_KEY: ${SECRET_KEY}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      MEDIA_PATH: /media
+    depends_on:
+      - db
+  web:
+    build: ./Monochrome/web
+    volumes:
+    - ./media:/srv/media
+    - caddy_data:/data
+    - ./Caddyfile:/etc/caddy/Caddyfile
     environment:
-      POSTFIXADMIN_DB_TYPE: pgsql
-      POSTFIXADMIN_DB_HOST: db
-      POSTFIXADMIN_DB_USER: mail
-      POSTFIXADMIN_DB_NAME: mail
-      POSTFIXADMIN_DB_PASSWORD: ${EMAIL_PASSWORD}
-    restart: unless-stopped    
+      DOMAIN_NAME: ${DOMAIN_NAME}
+      MANGA_DOMAIN_NAME: ${MANGA_DOMAIN_NAME}
+    ports:
+      - 80:80
+      - 443:443
 
 networks:
   default:
@@ -109,3 +103,7 @@ networks:
       driver: default
       config:
         - subnet: 10.69.0.0/24
+
+volumes:
+  caddy_data:
+  postgres_data:

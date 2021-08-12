@@ -1,0 +1,6 @@
+[submodule "Monochrome"]
+	path = Monochrome
+	url = https://github.com/D34DPlayer/Monochrome
+[submodule "portfolio"]
+	path = portfolio
+	url = https://github.com/D34DPlayer/my-portfolio
