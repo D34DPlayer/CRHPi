@@ -1,6 +1,16 @@
 version: "3.6"
 
 services:
+  vnc:
+    image: crhpi_vnc
+    restart: always
+    ports:
+      - 127.0.0.1:5900:5900
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1.5G
   vaultwarden:
     image: vaultwarden/server:latest # with amd64 and armv7 you can use alpine
     restart: unless-stopped
@@ -14,7 +24,7 @@ services:
     build:
       context: ./portfolio
       args:
-        - VUE_APP_DOMAIN_NAME=www.d34d.fun
+        - VUE_APP_DOMAIN_NAME=www.${DOMAIN_NAME}
     restart: unless-stopped
   dnscryptProxy:
     image: gists/dnscrypt-proxy
@@ -63,9 +73,32 @@ services:
       STUNNEL_ACCEPT: 853
       STUNNEL_CONNECT: bind:53
     restart: unless-stopped    
+  nextcloud-db:
+    image: postgres:13-alpine
+    restart: always
+    volumes:
+      - nextcloud-db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+
+  nextcloud:
+    build: ./nextcloud
+    restart: always
+    links:
+      - db
+    volumes:
+      - /mnt/cloud:/var/www/html
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_HOST=nextcloud-db
 
   db:
     image: postgres:13-alpine
+    restart: always
     environment:
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
@@ -74,9 +107,10 @@ services:
       - postgres_data:/var/lib/postgresql/data
   api:
     build: ./Monochrome/api
+    restart: always
     command: hypercorn api.main:app -b 0.0.0.0:3000 --root-path /api
     volumes:
-      - ./media:/media
+      - /mnt/media:/media
     environment:
       DB_URL: postgresql+asyncpg://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
       SECRET_KEY: ${SECRET_KEY}
@@ -86,8 +120,9 @@ services:
       - db
   web:
     build: ./Monochrome/web
+    restart: always
     volumes:
-    - ./media:/srv/media
+    - /mnt/media:/srv/media
     - caddy_data:/data
     - ./Caddyfile:/etc/caddy/Caddyfile
     environment:
@@ -107,3 +142,4 @@ networks:
 volumes:
   caddy_data:
   postgres_data:
+  nextcloud-db:

@@ -30,7 +30,7 @@ build:
 	@$(DC) build
 
 start up:
-	$(DC) up -d
+	$(DC) --compatibility up -d
 
 stop down:
 	$(DC) down -t 5
