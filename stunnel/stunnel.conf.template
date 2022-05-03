@@ -14,7 +14,6 @@ verifyChain = ${STUNNEL_VERIFY_CHAIN}
 sslVersionMin = TLSv1.2
 
 debug = ${STUNNEL_DEBUG}
-output = /var/log/stunnel/stunnel.log
 foreground = yes
 client = ${STUNNEL_CLIENT}
 

@@ -1,39 +1,31 @@
-manga.{$MANGA_DOMAIN_NAME} {
+(basicProxy) {
     encode zstd gzip
-
-    handle_path /api/* {
-        reverse_proxy api:3000 {
-            header_up X-Real-IP {remote_host}
-        }
-    }
-    handle_path /* {
-        root * /srv
-        file_server
-        try_files {path} /
+    reverse_proxy {args.0}:{args.1} {
+        header_up X-Real-IP {remote_host}
     }
 }
 
 bw.{$DOMAIN_NAME} {
-    encode zstd gzip
-
     reverse_proxy /notifications/hub vaultwarden:3012
 
-    reverse_proxy vaultwarden:80 {
-        header_up X-Real-IP {remote_host}
-    }
+    import basicProxy "vaultwarden" "80"
 }
 
 cloud.{$DOMAIN_NAME} {
-    encode zstd gzip
+    import basicProxy "nextcloud" "80"
+}
 
-    reverse_proxy nextcloud:80 {
-        header_up X-Real-IP {remote_host}
-    }
+yt.{$DOMAIN_NAME} {
+    import basicProxy "invidious" "3000"
+}
+
+jelly.{$DOMAIN_NAME} {
+    import basicProxy "host.docker.internal" "8096"
 }
 
 {$DOMAIN_NAME}, www.{$DOMAIN_NAME} {
     encode zstd gzip
-    
+
     handle /dns-query {
         reverse_proxy /dns-query doh:8053
     }

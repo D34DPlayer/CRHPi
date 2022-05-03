@@ -31,7 +31,7 @@
 ## Example with both IPv4 and IPv6:
 ## listen_addresses = ['127.0.0.1:53', '[::1]:53']
 
-listen_addresses = ['127.0.0.1:5353', '10.69.0.101:5353']
+listen_addresses = ['0.0.0.0:5353']
 
 
 ## Maximum number of simultaneous client connections to accept

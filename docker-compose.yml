@@ -1,16 +1,6 @@
 version: "3.6"
 
 services:
-  vnc:
-    image: crhpi_vnc
-    restart: always
-    ports:
-      - 127.0.0.1:5900:5900
-    deploy:
-      resources:
-        limits:
-          cpus: "1.5"
-          memory: 1.5G
   vaultwarden:
     image: vaultwarden/server:latest # with amd64 and armv7 you can use alpine
     restart: unless-stopped
@@ -24,7 +14,7 @@ services:
     build:
       context: ./portfolio
       args:
-        - VUE_APP_DOMAIN_NAME=www.${DOMAIN_NAME}
+        - DOMAIN_NAME=https://www.${DOMAIN_NAME}
     restart: unless-stopped
   dnscryptProxy:
     image: gists/dnscrypt-proxy
@@ -95,39 +85,81 @@ services:
       - POSTGRES_DB=nextcloud
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_HOST=nextcloud-db
+    ports:
+      - "3000:80"
+  jellyfin:
+    image: linuxserver/jellyfin
+    restart: always
+    network_mode: "host"
+    ports:
+      - "8096:8096"
+    volumes:
+      - jellyfin-config:/config
+      - jellyfin-cache:/cache
+      - /mnt/Media:/media/nextcloud
 
-  db:
-    image: postgres:13-alpine
+  invidious-db:
+    image: postgres:10-alpine
     restart: always
-    environment:
-      - POSTGRES_DB=${DB_NAME}
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_PASSWORD=${DB_PASS}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-  api:
-    build: ./Monochrome/api
+      - invidious-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: invidious
+      POSTGRES_USER: kemal
+      POSTGRES_PASSWORD: kemal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+  
+  invidious:
+    image: quay.io/invidious/invidious:latest-arm64
     restart: always
-    command: hypercorn api.main:app -b 0.0.0.0:3000 --root-path /api
-    volumes:
-      - /mnt/media:/media
+    mem_limit: 1024M
+    cpus: 0.5
     environment:
-      DB_URL: postgresql+asyncpg://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}
-      SECRET_KEY: ${SECRET_KEY}
-      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
-      MEDIA_PATH: /media
+      INVIDIOUS_CONFIG: |
+        channel_threads: 1
+        check_tables: true
+        feed_threads: 1
+        db:
+          dbname: invidious
+          user: kemal
+          password: kemal
+          host: invidious-db
+          port: 5432
+        full_refresh: false
+        https_only: true
+        domain: yt.${DOMAIN_NAME}
+        admins:
+          - d34d
+        admin_email: admin@d34d.one
+        external_port: 443
+    healthcheck:
+      test: wget -nv --tries=1 --spider http://127.0.0.1:3000/api/v1/comments/jNQXAC9IVRw || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 2
     depends_on:
-      - db
-  web:
-    build: ./Monochrome/web
+      - invidious-db
+
+  autoheal:
     restart: always
+    image: willfarrell/autoheal
+    environment:
+      - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
-    - /mnt/media:/srv/media
-    - caddy_data:/data
-    - ./Caddyfile:/etc/caddy/Caddyfile
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  caddy:
+    image: caddy
+    restart: always
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    volumes:
+      - ./data/caddy_config:/config
+      - ./data/caddy:/data
+      - ./Caddyfile:/etc/caddy/Caddyfile
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
-      MANGA_DOMAIN_NAME: ${MANGA_DOMAIN_NAME}
     ports:
       - 80:80
       - 443:443
@@ -140,6 +172,8 @@ networks:
         - subnet: 10.69.0.0/24
 
 volumes:
-  caddy_data:
   postgres_data:
+  jellyfin-config:
+  jellyfin-cache:
   nextcloud-db:
+  invidious-db:
