@@ -190,6 +190,7 @@ services:
       - ${TRANSMISSION_PEERPORT}:${TRANSMISSION_PEERPORT}/udp
 
   dashboard:
+    restart: always
     image: linuxserver/heimdall
     volumes:
       - ./data/heimdall:/config
@@ -201,6 +202,21 @@ services:
       - AUTOHEAL_CONTAINER_LABEL=all
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+
+  uptime:
+    restart: always
+    image: louislam/uptime-kuma:1
+    volumes:
+      - ./data/uptime:/app/data
+
+  yacht:
+    restart: always
+    image: selfhostedpro/yacht
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./data/yacht:/config
+    ports:
+      - 127.0.0.1:8000:8000
 
   caddy:
     image: caddy:2

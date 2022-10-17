@@ -62,6 +62,14 @@ dashboard.{$DOMAIN_NAME}, http://dashboard.{$LOCAL_DOMAIN} {
     import basicProxy "dashboard" "80"
 }
 
+uptime.{$DOMAIN_NAME}, http://uptime.{$LOCAL_DOMAIN} {
+    import basicProxy "uptime" "3001"
+}
+
+http://yacht.{$LOCAL_DOMAIN} {
+    import basicProxy "yacht" "8000"
+}
+
 {$DOMAIN_NAME}, www.{$DOMAIN_NAME}, http://www.{$LOCAL_DOMAIN} {
     encode zstd gzip
 
