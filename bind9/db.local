@@ -1,7 +1,7 @@
-$ORIGIN local.    ; default zone domain
+$ORIGIN d34d.    ; default zone domain
 $TTL 86400        ; default time to live
 
-@ IN SOA local. admin.local. (
+@ IN SOA d34d. admin.d34d. (
         2021032801  ; serial number
         21600       ; Refresh
         3600        ; Retry
@@ -9,8 +9,15 @@ $TTL 86400        ; default time to live
         86400       ; Min TTL
         )
 
-        NS      ns.local.
-		A       192.168.69.69
+        NS      ns.d34d.
+        A       192.168.69.234
 
 
-ns    IN     A        192.168.69.69
+d34d.  IN     A        192.168.69.234
+ns      IN     A        192.168.69.234
+
+www     IN     CNAME    d34d.
+bw      IN     CNAME    d34d.
+cloud   IN     CNAME    d34d.
+jelly   IN     CNAME    d34d.
+yt      IN     CNAME    d34d.

@@ -10,6 +10,7 @@ RUN set -ex; \
         smbclient \
         supervisor \
         libreoffice \
+	sudo \
     ; \
     rm -rf /var/lib/apt/lists/*
 
@@ -51,6 +52,8 @@ RUN mkdir -p \
     /var/log/supervisord \
     /var/run/supervisord \
 ;
+
+RUN echo "\n* */1 * * * php -f /var/www/html/occ files:scan --path D34DPlayer/files/Familia/Torrents" >> /var/spool/cron/crontabs/www-data
 
 COPY supervisord.conf /
 

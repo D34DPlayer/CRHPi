@@ -10,14 +10,16 @@ services:
       - .env
     volumes:
       - "./data/bw:/data"
+  
   portfolio:
     build:
       context: ./portfolio
       args:
         - DOMAIN_NAME=https://www.${DOMAIN_NAME}
     restart: unless-stopped
+  
   dnscryptProxy:
-    image: gists/dnscrypt-proxy
+    image: gists/dnscrypt-proxy:latest
     networks:
       default:
         ipv4_address: 10.69.0.101
@@ -34,6 +36,7 @@ services:
       - 53:53/tcp
       - 53:53/udp
     restart: unless-stopped    
+  
   openvpn:
     build: ./openvpn
     ports:
@@ -45,8 +48,9 @@ services:
     cap_add:
       - NET_ADMIN
     restart: unless-stopped    
+  
   doh:
-    image: satishweb/doh-server
+    image: satishweb/doh-server:alpine
     environment:
       UPSTREAM_DNS_SERVER: udp:bind:53
       DOH_HTTP_PREFIX: /dns-query
@@ -63,6 +67,7 @@ services:
       STUNNEL_ACCEPT: 853
       STUNNEL_CONNECT: bind:53
     restart: unless-stopped    
+
   nextcloud-db:
     image: postgres:13-alpine
     restart: always
@@ -72,23 +77,22 @@ services:
       - POSTGRES_DB=nextcloud
       - POSTGRES_PASSWORD=${DB_PASS}
       - POSTGRES_USER=${DB_USER}
-
   nextcloud:
     build: ./nextcloud
     restart: always
-    links:
-      - db
     volumes:
       - /mnt/cloud:/var/www/html
     environment:
-      - POSTGRES_PASSWORD=${DB_PASS}
-      - POSTGRES_DB=nextcloud
-      - POSTGRES_USER=${DB_USER}
-      - POSTGRES_HOST=nextcloud-db
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: nextcloud
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_HOST: nextcloud-db
+      NEXTCLOUD_TRUSTED_DOMAINS: "cloud.${DOMAIN_NAME} cloud.${LOCAL_DOMAIN}"
     ports:
       - "3000:80"
+  
   jellyfin:
-    image: linuxserver/jellyfin
+    image: linuxserver/jellyfin:latest
     restart: always
     network_mode: "host"
     ports:
@@ -109,7 +113,6 @@ services:
       POSTGRES_PASSWORD: kemal
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-  
   invidious:
     image: quay.io/invidious/invidious:latest-arm64
     restart: always
@@ -141,6 +144,51 @@ services:
     depends_on:
       - invidious-db
 
+  matrix:
+    restart: always
+    image: matrixconduit/matrix-conduit:latest
+    volumes:
+      - matrix-db:/var/lib/matrix-conduit
+    ports:
+      - 127.0.0.1:6167:6167
+    healthcheck:
+      disable: true
+    environment:
+      CONDUIT_SERVER_NAME: matrix.${DOMAIN_NAME}
+      CONDUIT_DATABASE_BACKEND: rocksdb
+      CONDUIT_DATABASE_PATH: /var/lib/matrix-conduit/
+      CONDUIT_PORT: 6167
+      CONDUIT_ADDRESS: 0.0.0.0
+      CONDUIT_MAX_REQUEST_SIZE: 100_000_000
+      CONDUIT_ALLOW_REGISTRATION: "true"
+      CONDUIT_ALLOW_FEDERATION: "true"
+      CONDUIT_TRUSTED_SERVERS: '["matrix.org"]'
+      CONDUIT_CONFIG: ''
+  matrix-web:
+    image: vectorim/element-web:latest
+    restart: always
+    volumes:
+      - ./element.json:/app/config.json
+
+  transmission:
+    image: lscr.io/linuxserver/transmission:latest
+    restart: always
+    environment:
+      - PUID=33
+      - GUID=33
+      - TZ=Europe/Brussels
+      - USER=${TRANSMISSION_USER}
+      - PASS=${TRANSMISSION_PWD}
+      - PEERPORT=${TRANSMISSION_PEERPORT}
+      - TRANSMISSION_WEB_HOME=/flood-for-transmission/
+    volumes:
+      - ./data/transmission:/config
+      - /mnt/Torrents/Downloads:/downloads
+      - /mnt/Torrents/Sources:/watch
+    ports:
+      - ${TRANSMISSION_PEERPORT}:${TRANSMISSION_PEERPORT}
+      - ${TRANSMISSION_PEERPORT}:${TRANSMISSION_PEERPORT}/udp
+
   autoheal:
     restart: always
     image: willfarrell/autoheal
@@ -150,7 +198,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   caddy:
-    image: caddy
+    image: caddy:2
     restart: always
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -160,6 +208,7 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile
     environment:
       DOMAIN_NAME: ${DOMAIN_NAME}
+      LOCAL_DOMAIN: ${LOCAL_DOMAIN}
     ports:
       - 80:80
       - 443:443
@@ -177,3 +226,4 @@ volumes:
   jellyfin-cache:
   nextcloud-db:
   invidious-db:
+  matrix-db:

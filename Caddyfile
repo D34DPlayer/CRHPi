@@ -5,25 +5,60 @@
     }
 }
 
-bw.{$DOMAIN_NAME} {
+bw.{$DOMAIN_NAME}, http://bw.{$LOCAL_DOMAIN} {
     reverse_proxy /notifications/hub vaultwarden:3012
 
     import basicProxy "vaultwarden" "80"
 }
 
-cloud.{$DOMAIN_NAME} {
+cloud.{$DOMAIN_NAME}, http://cloud.{$LOCAL_DOMAIN} {
     import basicProxy "nextcloud" "80"
 }
 
-yt.{$DOMAIN_NAME} {
+yt.{$DOMAIN_NAME}, http://yt.{$LOCAL_DOMAIN} {
     import basicProxy "invidious" "3000"
 }
 
-jelly.{$DOMAIN_NAME} {
+jelly.{$DOMAIN_NAME}, http://jelly.{$LOCAL_DOMAIN} {
     import basicProxy "host.docker.internal" "8096"
 }
 
-{$DOMAIN_NAME}, www.{$DOMAIN_NAME} {
+matrix.{$DOMAIN_NAME} {
+    encode zstd gzip
+
+    handle_path /.well-known/matrix/* {
+
+        header Access-Control-Allow-Origin *
+
+        ## `Content-Type: application/json` isn't required by the matrix spec
+        ## but some browsers (firefox) and some other tooling might preview json 
+        ## content prettier when they are made aware via Content-Type
+        header Content-Type application/json
+
+        respond /client `{ "m.homeserver": { "base_url": "https://matrix.d34d.one" } }`
+
+        respond /server `{ "m.server": "matrix.d34d.one:443" }`
+
+        ## return http/404 if nothing matches 
+        respond 404
+    }  
+    handle /_matrix/* {
+        reverse_proxy matrix:6167
+    }
+    handle {
+        reverse_proxy matrix-web:80
+    }
+}
+
+matrix.{$DOMAIN_NAME}:8448 {
+    import basicProxy "matrix" "6167"
+}
+
+transmission.{$DOMAIN_NAME}, http://transmission.{$LOCAL_DOMAIN} {
+    import basicProxy "transmission" "9091"
+}
+
+{$DOMAIN_NAME}, www.{$DOMAIN_NAME}, http://www.{$LOCAL_DOMAIN} {
     encode zstd gzip
 
     handle /dns-query {

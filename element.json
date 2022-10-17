@@ -1,0 +1,42 @@
+{
+    "default_server_name": "matrix.d34d.one",
+    "disable_custom_urls": false,
+    "brand": "D34D Element",
+    "permalink_prefix": "https://matrix.d34d.one",
+    "default_theme": "light",
+    "features": { },
+    "show_labs_settings": false,
+    "map_style_url": "https://api.maptiler.com/maps/streets/style.json?key=GGz4rjINq7qV64W30NDp",
+    "disable_3pid_login": false,
+    "disable_login_language_selector": false,
+    "disable_guests": false,
+    "enable_presence_by_hs_url": {
+        "https://matrix.org": false,
+        "https://matrix-client.matrix.org": false
+    },
+    "default_country_code": "BE",
+    "default_federate": true,
+    "room_directory": {
+        "servers": [
+            "matrix.org",
+	    "gitter.im",
+	    "libera.chat"
+        ]
+    },
+
+    "setting_defaults": {
+        "breadcrumbs": true
+    },
+    "integrations_ui_url": "https://scalar.vector.im/",
+    "integrations_rest_url": "https://scalar.vector.im/api",
+    "integrations_widgets_urls": [
+        "https://scalar.vector.im/_matrix/integrations/v1",
+        "https://scalar.vector.im/api",
+        "https://scalar-staging.vector.im/_matrix/integrations/v1",
+        "https://scalar-staging.vector.im/api",
+        "https://scalar-staging.riot.im/scalar/api"
+    ],
+    "jitsi": {
+        "preferred_domain": "meet.element.io"
+    }
+}
