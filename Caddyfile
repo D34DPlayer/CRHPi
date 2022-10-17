@@ -58,6 +58,10 @@ transmission.{$DOMAIN_NAME}, http://transmission.{$LOCAL_DOMAIN} {
     import basicProxy "transmission" "9091"
 }
 
+dashboard.{$DOMAIN_NAME}, http://dashboard.{$LOCAL_DOMAIN} {
+    import basicProxy "dashboard" "80"
+}
+
 {$DOMAIN_NAME}, www.{$DOMAIN_NAME}, http://www.{$LOCAL_DOMAIN} {
     encode zstd gzip
 

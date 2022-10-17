@@ -14,10 +14,11 @@ $TTL 86400        ; default time to live
 
 
 d34d.  IN     A        192.168.69.234
-ns      IN     A        192.168.69.234
+ns     IN     A        192.168.69.234
 
-www     IN     CNAME    d34d.
-bw      IN     CNAME    d34d.
-cloud   IN     CNAME    d34d.
-jelly   IN     CNAME    d34d.
-yt      IN     CNAME    d34d.
+www       IN     CNAME    d34d.
+bw        IN     CNAME    d34d.
+cloud     IN     CNAME    d34d.
+jelly     IN     CNAME    d34d.
+yt        IN     CNAME    d34d.
+dashboard IN     CNAME    d34d.

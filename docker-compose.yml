@@ -189,6 +189,11 @@ services:
       - ${TRANSMISSION_PEERPORT}:${TRANSMISSION_PEERPORT}
       - ${TRANSMISSION_PEERPORT}:${TRANSMISSION_PEERPORT}/udp
 
+  dashboard:
+    image: linuxserver/heimdall
+    volumes:
+      - ./data/heimdall:/config
+
   autoheal:
     restart: always
     image: willfarrell/autoheal
