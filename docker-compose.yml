@@ -188,6 +188,18 @@ services:
     ports:
       - ${TRANSMISSION_PEERPORT}:${TRANSMISSION_PEERPORT}
       - ${TRANSMISSION_PEERPORT}:${TRANSMISSION_PEERPORT}/udp
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail -u $$USER:$$PASS http://localhost:9091 || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 2
+
+  openbooks:
+    restart: always
+    image: evanbuss/openbooks
+    volumes:
+      - /mnt/Books:/books
+    command: --persist
 
   dashboard:
     restart: always

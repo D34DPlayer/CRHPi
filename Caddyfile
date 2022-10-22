@@ -58,6 +58,10 @@ transmission.{$DOMAIN_NAME}, http://transmission.{$LOCAL_DOMAIN} {
     import basicProxy "transmission" "9091"
 }
 
+books.{$DOMAIN_NAME}, http://books.{$LOCAL_DOMAIN} {
+    import basicProxy "openbooks" "80"
+}
+
 dashboard.{$DOMAIN_NAME}, http://dashboard.{$LOCAL_DOMAIN} {
     import basicProxy "dashboard" "80"
 }
