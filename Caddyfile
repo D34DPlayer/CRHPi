@@ -70,8 +70,8 @@ uptime.{$DOMAIN_NAME}, http://uptime.{$LOCAL_DOMAIN} {
     import basicProxy "uptime" "3001"
 }
 
-http://yacht.{$LOCAL_DOMAIN} {
-    import basicProxy "yacht" "8000"
+http://admin.{$LOCAL_DOMAIN} {
+    import basicProxy "portainer" "9000"
 }
 
 {$DOMAIN_NAME}, www.{$DOMAIN_NAME}, http://www.{$LOCAL_DOMAIN} {

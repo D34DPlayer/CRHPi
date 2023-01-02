@@ -221,14 +221,15 @@ services:
     volumes:
       - ./data/uptime:/app/data
 
-  yacht:
+  portainer:
     restart: always
-    image: selfhostedpro/yacht
+    image: portainer/portainer-ee:latest
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./data/yacht:/config
+      - ./data/portainer:/data
     ports:
-      - 127.0.0.1:8000:8000
+      - 10.69.0.1:8000:8000
+      - 10.69.0.1:9000:9000
 
   caddy:
     image: caddy:2
